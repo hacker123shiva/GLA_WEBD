@@ -17,19 +17,19 @@ app.use(session({
 
 app.use(flash());
 
-app.use((req, res, next) => {
-    res.locals.success = req.flash('success')
-    res.locals.error = req.flash("error")
-    next()
-})
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(User.createStrategy());
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.use((req, res, next) => {
+    res.locals.currentUser=req.user
+    res.locals.success = req.flash('success')
+    res.locals.error = req.flash("error")
+    next()
+})
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
@@ -39,6 +39,8 @@ hbs.registerPartials(__dirname + '/views/partials');
 app.use("/", require("./routes/product"))
 app.use("/", require("./routes/review"))
 app.use("/",require("./routes/auth"))
+app.use("/",require("./routes/api"))
+app.use("/",require("./routes/cart"))
 
 mongoose.connect('mongodb://127.0.0.1:27017/eCommerce_secS')
     .then(() => {
